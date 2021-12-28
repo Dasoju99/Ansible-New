@@ -1,0 +1,23 @@
+
+- hosts: self
+  become: yes
+  tasks:
+  - name: Install Nginx
+    tags:
+    - Install
+    yum:
+      name: nginx
+      state: present
+  - name: copy Index.html
+    tags:
+    - copy
+    copy:
+      src: index.html
+      dest: /usr/share/nginx/html/index.html
+  - name: Start Nginx service
+    tags:
+    - start
+    service:
+      name: nginx
+      state: started
+

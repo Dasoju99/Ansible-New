@@ -1,0 +1,8 @@
+- hosts: self
+  become: yes
+  tasks: 
+  - name: Host Vars
+    debug:
+      var: result
+ 
+

@@ -1,0 +1,51 @@
+- hosts: 172.31.6.191
+  become: yes
+  tasks:
+  - name: Remove maven existed zip file
+    file:
+      path: /opt/apache-maven-3.8.4-bin.zip
+      state: absent
+  - name: Remove maven existed folder in home location
+    file:
+      path: /home/ansible/apache-maven-3.8.4
+      state: absent
+  - name: Remove maven existed folder in opt location
+    file:
+      path: /opt/apache-maven-3.8.4
+      state: absent
+  - name: Download Maven
+    get_url:
+      url: https://dlcdn.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.zip
+      dest: /opt/apache-maven-3.8.4-bin.zip
+  - name: Unzipping Maven
+    shell: sudo unzip /opt/apache-maven-3.8.4-bin.zip
+  - name: Moving
+    shell: mv /home/ansible/apache-maven-3.8.4 /opt/
+  - name: Adding the 1 st path in the bashrc files
+    lineinfile:
+      path: /home/ansible/.bash_profile
+      line: 'PATH=$PATH:$HOME/bin'
+      insertbefore: EOF
+  - name: Adding the 2nd path in the bashrc files
+    lineinfile:
+      path: /home/ansible/.bash_profile
+      line: 'export PATH'
+      insertbefore: EOF
+  - name: Adding the 3rd path in the bashrc files
+    lineinfile:
+      path: /home/ansible/.bash_profile
+      line: 'export M2_HOME=/opt/apache-maven-3.8.4'
+      insertbefore: EOF
+  - name: Adding the 4th path in the bashrc files
+    lineinfile:
+      path: /home/ansible/.bash_profile
+      line: 'export PATH=$PATH:$M2_HOME/bin'
+      insertbefore: EOF
+  - name: Print Maven Installation Details
+    debug:
+      msg: "Maven Installed Successfully"
+  - name: mvn version
+    shell: mvn -version
+    args:
+      chdir: /opt/apache-maven-3.8.4/ 
+      executable: /home/ansible/.bash_profile

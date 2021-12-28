@@ -1,0 +1,120 @@
+#ansible-playbook tomcattags.yml --tags install
+#start
+#stop
+- hosts: 172.31.32.69
+  become: yes
+  vars:  
+    prt: 8080
+  tasks:
+  - name: install open JDK
+    tags:
+    - install
+    yum:
+      name: java-11-openjdk-devel
+      state: present
+  - name: Download Tomcat file
+    tags:
+    - install
+    get_url:
+      url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.56/bin/apache-tomcat-9.0.56.zip
+      dest: /opt/apache-tomcat-9.0.56.zip
+  - name: Remove tomcat existed folder
+    tags:
+    - install
+    file:
+      path: /home/ansible/apache-tomcat-9.0.56
+      state: absent
+  - name: unzipping file
+    tags:
+    - install
+    shell: unzip /opt/apache-tomcat-9.0.56.zip
+  - name: Remove tomcat existed folder
+    tags:
+    - install
+    file:
+      path: /opt/apache-tomcat-9.0.56
+      state: absent
+  - name: Moving
+    tags:
+    - install
+    shell: mv /home/ansible/apache-tomcat-9.0.56 /opt/
+  - name: add u+x permissions
+    tags:
+    - install
+    shell: chmod u+x /opt/apache-tomcat-9.0.56/bin/*.sh
+
+  - name: change port of tomcat from 8080 to {{prt}}
+    tags:
+    - install
+    replace:
+      regexp: <Connector port="8080"  
+      replace: <Connector port="{{prt}}" 
+      path: /opt/apache-tomcat-9.0.56/conf/server.xml
+  - name: Remove MANAGER APP content 1 from Context.xml file
+    tags:
+    - install
+    replace:
+      regexp: <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+      replace: " "
+      path: /opt/apache-tomcat-9.0.56/webapps/manager/META-INF/context.xml
+   
+  - name: Remove MANAGER APP content 2 from Context.xml file
+    tags:
+    - install
+    replace:
+      regexp: allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
+      replace: " "           
+      path: /opt/apache-tomcat-9.0.56/webapps/manager/META-INF/context.xml 
+
+  - name: Remove HOST MANAGER APP content 1 from Context.xml file
+    tags:
+    - install
+    replace:
+      regexp: <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+      replace: " "
+      path: /opt/apache-tomcat-9.0.56/webapps/host-manager/META-INF/context.xml
+
+  - name: Remove HOST MANAGER APP content 2 from Context.xml file
+    tags:
+    - install
+    replace:
+      regexp: allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
+      replace: " "
+      path: /opt/apache-tomcat-9.0.56/webapps/host-manager/META-INF/context.xml
+
+
+  - name: adding manager-gui, manager-script & admin-gui in tomcat-users.xml file
+    tags:
+    - install
+    replace:
+      regexp: </tomcat-users>
+      replace: <user username="Dasoju" password="96321" roles="manager-gui,admin-gui,manager-script"/> 
+      path: /opt/apache-tomcat-9.0.56/conf/tomcat-users.xml
+  - name: adding ending tag in tomcat-users.xml file
+    tags:
+    - install
+    lineinfile:
+      path: /opt/apache-tomcat-9.0.56/conf/tomcat-users.xml
+      line: </tomcat-users>
+      insertbefore: EOF
+  - name: start Tomcat
+    tags:
+    - start
+    shell: nohup /opt/apache-tomcat-9.0.56/bin/startup.sh
+    register: status
+  - name: Print satus
+    tags:
+    - start
+    debug:
+      var: status.stdout
+  - name: stop Tomcat
+    tags:
+    - stop
+    shell: nohup /opt/apache-tomcat-9.0.56/bin/shutdown.sh
+    register: stopstatus
+  - name: Print satus
+    tags:
+    - stop
+    debug:
+      var: stopstatus
+

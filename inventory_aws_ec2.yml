@@ -1,0 +1,22 @@
+plugin: aws_ec2
+#aws_access_key: AKIA5COVCZSRMIFYEEZ3
+#aws_secret_key: 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
+regions: 
+  - ap-south-1
+filters:
+  instance-state-name: running
+keyed_groups:
+  - key: tags.name
+    separator: ""
+    prefix: ""
+hostnames:
+  - private-ip-address
+compose:
+  # Use the private IP address to connect to the host
+  # (note: this does not modify inventory_hostname, which is set via I(hostnames))
+  ansible_host: private_ip_address
+
+
+# command to run: ansible-inventory -i inventory_aws_ec2.yml --graph
+
+

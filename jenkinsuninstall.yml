@@ -1,0 +1,12 @@
+- hosts: 172.31.3.116
+  become: yes
+  tasks:
+  - name: uninstall jenkins
+    yum:
+      name: jenkins
+      state: absent
+  - name: Remove Jenkins Repo
+    file:
+      path: /etc/yum.repos.d/jenkins.repo
+      state: absent
+

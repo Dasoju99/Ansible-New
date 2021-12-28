@@ -1,0 +1,14 @@
+- hosts: self
+  become: yes
+  tasks:
+  - name: Download Java JDK
+    get_url:
+      url: http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+      dest: /opt/
+      headers: 'Cookie: oraclelicense=accept-securebackup-cookie'
+  - name: Install Java JDK rpm from a local file
+    yum:
+      name: /opt/jdk-8u131-linux-x64.rpm
+      state: present
+    become: yes
+

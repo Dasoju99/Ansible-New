@@ -1,0 +1,14 @@
+
+- hosts: 172.31.3.195
+  become: yes
+  tasks:
+  - name: Installation of unzip command
+    yum:
+      name: unzip
+      state: present
+
+  - name: Installation of tar command
+    yum:
+      name: tar
+      state: present
+

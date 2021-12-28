@@ -1,0 +1,9 @@
+
+- hosts: sq
+  become: yes
+  tasks:
+  - name: Installation of packages
+    ignore_errors: yes
+    yum:
+      name: ['wget', 'git', 'vim', 'unzip']
+      state: present

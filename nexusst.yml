@@ -1,0 +1,36 @@
+
+- hosts: 172.31.15.83
+  become: yes
+  tasks:
+  - name: Start the nexus service
+    tags:
+    - install
+    shell: sudo systemctl start nexus
+    register: nexstart
+  - name: Print Nexus Start Status
+    tags:
+    - install
+    debug:
+      var: nexstart
+  - name: Status of the nexus service
+    tags:
+    - install
+    shell: sudo systemctl status nexus
+    register: nexstatus
+  - name: Print Nexus Status
+    tags:
+    - install
+    debug:
+      var: nexstatus.stdout_lines
+# -----------------------------------
+  - name: Stop the nexus service
+    tags:
+    - stop
+    shell: sudo systemctl stop nexus
+    register: nexstop
+  - name: Print Nexus Stop Status
+    tags:
+    - stop
+    debug:
+      var: nexstop
+

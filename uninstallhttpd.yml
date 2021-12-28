@@ -1,0 +1,13 @@
+
+- hosts: self
+  become: yes
+  tasks:
+  - name: UnInstall httpd
+    yum:
+      name: httpd
+      state: absent
+      autoremove: yes 
+  - name: remove www folder
+    file:
+      path: /var/www
+      state: absent

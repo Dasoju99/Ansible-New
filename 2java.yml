@@ -1,0 +1,23 @@
+- hosts: all
+  become: yes
+  tasks:
+  - name: Download Java JDK
+    get_url:
+      url: http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm
+      dest: /opt/jdk-8u131-linux-x64.rpm
+      headers: 'Cookie: oraclelicense=accept-securebackup-cookie'
+  - name: Install ansible 2.9.12
+    become: yes
+    shell: pip3 install --user ansible==2.9.12
+  - name: Install Java JDK rpm from a local file
+    become: yes
+    yum:
+      name: /opt/jdk-8u131-linux-x64.rpm
+      state: present
+  - name: Java Version Check
+    shell: javac -version
+    register: javaversion
+  - name: Print Java Version
+    debug:
+      var: javaversion.stderr_lines
+

@@ -1,0 +1,85 @@
+#ansible-playbook tomcattags.yml --tags install
+#start
+#stop
+
+- hosts: 172.31.9.154
+  become: yes
+  tasks:
+  - name: install open JDK
+    tags:
+    - install
+    yum:
+      name: java-11-openjdk-devel
+      state: present
+  - name: Download wildfly file
+    tags:
+    - install
+    get_url:
+      url: https://github.com/wildfly/wildfly/releases/download/26.0.0.Beta1/wildfly-26.0.0.Beta1.zip
+      dest: /opt/wildfly-26.0.0.Beta1.zip
+  - name: Remove Wildfly existed folder in home location
+    tags:
+    - install
+    file:
+      path: /home/ansible/wildfly-26.0.0.Beta1
+      state: absent
+  - name: unzipping file
+    tags:
+    - install
+    shell: unzip /opt/wildfly-26.0.0.Beta1.zip
+  - name: Remove Wildfly zip file in opt location
+    tags:
+    - install
+    file:
+      path: /opt/wildfly-26.0.0.Beta1.zip
+      state: absent
+  - name: Remove wildfly  existed folder in opt location
+    tags:
+    - install
+    file:
+      path: /opt/wildfly-26.0.0.Beta1
+      state: absent
+  - name: Moving
+    tags:
+    - install
+    shell: mv /home/ansible/wildfly-26.0.0.Beta1 /opt/
+
+  - name: Add Ip add. in standalone.xml file 
+    tags:
+    - install
+    replace:
+      regexp: 127.0.0.1
+      replace: 172.31.9.154
+      path: /opt/wildfly-26.0.0.Beta1/standalone/configuration/standalone.xml
+  - name: add user and password
+    tags:
+    - install
+    shell:
+      cmd: JBOSS_HOME='/opt/wildfly-26.0.0.Beta1/' /bin/bash -c '/opt/wildfly-26.0.0.Beta1/bin/add-user.sh -u Dasoju -p 96321'
+      register: wildfly_user
+  - name: print
+    tags:
+    - install
+    debug:
+      msg: wildfly_user
+  - name: Start Wildfly
+    tags:
+    - install
+    shell: nohup /opt/wildfly-26.0.0.Beta1/bin/standalone.sh
+    register: status
+  - name: Print satus
+    tags:
+    - install
+    debug:
+      msg: status
+#  - name: stop Tomcat
+ #   tags:
+  #  - stop
+   # shell: nohup /opt/apache-tomcat-9.0.56/bin/shutdown.sh
+    #register: stopstatus
+#  - name: Print satus
+ #   tags:
+  #  - stop
+   # debug:
+    #  var: stopstatus
+

@@ -1,0 +1,8 @@
+
+- hosts: self
+  become: yes
+  tasks: 
+  - name: install JDK
+    yum:
+      name: /opt/jdk-8u60-linux-x64.rpm
+      state: present

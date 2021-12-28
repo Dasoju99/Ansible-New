@@ -1,0 +1,30 @@
+
+- hosts: 172.31.3.116
+  become: yes
+  tasks:
+  - name: install open JDK
+    yum:
+      name: java-11-openjdk-devel
+      state: present
+  - name: Download Tomcat file
+    get_url:
+      url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.55/bin/apache-tomcat-9.0.55.zip
+      dest: /opt/apache-tomcat-9.0.55.zip
+  - name: Remove tomcat existed folder
+    file:
+      path: /home/ansible/apache-tomcat-9.0.55
+      state: absent
+  - name: unzipping file
+    shell: unzip /opt/apache-tomcat-9.0.55.zip
+  - name: Remove tomcat existed folder
+    file:
+      path: /opt/apache-tomcat-9.0.55
+      state: absent
+  - name: Moving
+    shell: mv /home/ansible/apache-tomcat-9.0.55 /opt/
+  - name: add u+x permissions
+    shell: chmod u+x /opt/apache-tomcat-9.0.55/bin/*.sh
+  - name: Doing sh
+    shell: nohup /opt/apache-tomcat-9.0.55/bin/startup.sh
+
+

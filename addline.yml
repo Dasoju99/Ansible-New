@@ -1,0 +1,13 @@
+- hosts: 172.31.12.47
+  become: yes
+  tasks:
+  - name: create file
+    file:
+      path: /home/ansible/input.txt
+      state: touch
+      
+  - name: line insert
+    lineinfile:
+      path: /home/ansible/input.txt
+      line: 'Added Line 0 Rajesh'
+      insertbefore: BOF

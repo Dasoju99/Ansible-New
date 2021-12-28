@@ -1,0 +1,8 @@
+- hosts: maven 
+  become: yes
+  tasks: 
+  - name: Group Vars
+    debug:
+      var: test
+ 
+

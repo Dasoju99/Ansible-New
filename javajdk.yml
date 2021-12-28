@@ -1,0 +1,8 @@
+- hosts: 172.31.3.116 
+  become: yes
+  tasks:
+  - name: install open JDK
+    yum:
+      name: java-11-openjdk-devel
+      state: present
+

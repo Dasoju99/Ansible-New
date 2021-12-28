@@ -1,0 +1,13 @@
+
+- hosts: 172.31.6.191
+  tasks:
+    - name: Fetching to Ansible server
+      fetch:
+        src: /home/ansible/good.txt
+        dest: /home/ansible/good.txt
+- hosts: 172.31.12.47 
+  tasks:
+    - name: Copying from Ansible server
+      copy:
+        src: /home/ansible/good.txt        
+        dest: /home/ansible/good.txt 

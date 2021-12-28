@@ -1,0 +1,54 @@
+- hosts: 172.31.15.83
+  become: yes
+  tasks:
+  - name: Remove repos folder in etc location
+    tags:
+    - install
+    file:
+      path: /etc/yum.repos.d/
+      state: absent
+  - name: Download JFrog file 
+    tags:
+    - install
+    get_url:
+      url: https://releases.jfrog.io/artifactory/artifactory-rpms/artifactory-rpms.repo
+      dest: /opt/jfrog-artifactory-rpms.repo
+  - name: Create YUMREPOS folder
+    tags:
+    - install
+
+    shell: mkdir /etc/yum.repos.d
+  - name: MOving to etc
+    tags:
+    - install
+    shell: mv /opt/jfrog-artifactory-rpms.repo /etc/yum.repos.d/
+  - name: Installation
+    tags:
+    - install
+    yum:
+      name: jfrog-artifactory-oss
+      state: present
+  - name: Enable service
+    tags:
+    - install 
+    shell: systemctl enable artifactory
+  - name: Start service
+    tags:
+    - start
+    shell: systemctl start artifactory
+  - name: Status of the  service
+    tags:
+    - start
+    shell: systemctl status artifactory
+    register: jf
+  - name: Print Status
+    tags:
+    - start
+    debug:
+      var: jf.stdout_lines 
+  - name: Stop service
+    tags:
+    - stop
+    shell: systemctl stop artifactory
+
+

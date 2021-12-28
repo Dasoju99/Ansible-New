@@ -1,0 +1,9 @@
+- hosts: all
+  become: yes
+  tasks:
+  - name: Uninstall Git
+    apt-get:
+      pkg: git
+      state: absent 
+
+

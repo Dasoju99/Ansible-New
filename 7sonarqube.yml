@@ -1,0 +1,113 @@
+#ansible-playbook sonarqube.yml --tags status
+#ansible-playbook sonarqube.yml --tags start
+#ansible-playbook sonarqube.yml --tags stop
+#ansible-playbook sonarqube.yml --tags delete
+
+
+- hosts: 172.31.3.217
+  become: yes
+  vars:
+    son: sonar
+    prt: 9000 
+  tasks:
+  - name: Remove sonarqube existed folder from home dir
+    tags:
+    - install
+    - delete
+    file:
+      path: /home/ansible/sonarqube-7.8
+      state: absent
+  - name: Remove sonarqube existed folder from opt dir
+    tags:
+    - install
+    - delete
+    file:
+      path: /opt/sonarqube-7.8
+      state: absent
+  - name: Download Sonarqube7.8
+    tags:
+    - install
+    get_url:
+      url: https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-7.8.zip
+      dest: /opt/sonarqube-7.8.zip
+  - name: unzipping file
+    tags:
+    - install
+    shell: unzip /opt/sonarqube-7.8.zip 
+  - name: Moving
+    tags:
+    - install
+    shell: mv /home/ansible/sonarqube-7.8 /opt/
+  - name: Remove sonarqube zip folder from opt dir
+    tags:
+    - install
+    - delete
+    file:
+      path: /opt/sonarqube-7.8.zip
+      state: absent
+
+  - name: sonar user delete
+    tags:
+    - install
+    - delete
+    shell: userdel sonar
+  - name: sonar user add 
+    tags:
+    - install
+    shell: useradd sonar
+  - name: line add in visudo
+    tags:
+    - install
+    lineinfile:
+      path: /etc/sudoers
+      line: 'sonar        ALL=(ALL)       NOPASSWD: ALL'
+      insertbefore: EOF
+  - name: chown
+    tags:
+    - install
+    shell: chown -R sonar:sonar /opt/sonarqube-7.8/
+  - name: chmod
+    tags:
+    - install
+    shell: chmod -R 775 /opt/sonarqube-7.8/
+  - name: change port of 9000 from  to {{prt}}
+    tags:
+    - install
+    lineinfile:
+      path: /opt/sonarqube-7.8/conf/sonar.properties
+      line: sonar.web.port={{prt}}
+      insertbefore: EOF
+    
+  - name: startting the sonarqube server
+    tags:
+    - start
+    become_user: sonar
+    shell: nohup /opt/sonarqube-7.8/bin/linux-x86-64/sonar.sh start & 
+    register: sonstart
+  - name: Print status
+    tags:
+    - start
+    debug:
+      var: sonstart.stdout_lines
+  - name: status of the sonarqube server
+    tags:
+    - status
+    shell: nohup /opt/sonarqube-7.8/bin/linux-x86-64/sonar.sh status &
+    register: sonstatus
+  - name: Print status
+    tags:
+    - status 
+    debug:
+      var: sonstatus.stdout_lines
+  - name: stopping the sonarqube server
+    tags:
+    - stop
+    shell: nohup /opt/sonarqube-7.8/bin/linux-x86-64/sonar.sh stop &
+    register: sonstop
+  - name: Print status
+    tags:
+    - stop
+    debug:
+      var: sonstop.stdout_lines
+
+

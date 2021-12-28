@@ -1,0 +1,12 @@
+- hosts: 172.31.6.191
+  become: yes
+  tasks:
+  - name: Remove tomcat existed folder
+    file:
+      path: /home/ansible/apache-tomcat-9.0.55
+      state: absent
+  - name: Remove tomcat existed folder
+    file:
+      path: /opt/apache-tomcat-9.0.55
+      state: absent
+

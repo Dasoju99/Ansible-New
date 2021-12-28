@@ -1,0 +1,15 @@
+- hosts: all 
+  become: yes
+  tasks:
+  - name: Install Git
+    yum:
+      name: "{{gitpack}}"
+      state: present
+  - name: check git version
+    shell: git --version
+    register: gitversion
+  - name: print git version
+    debug:
+      var: gitversion.stdout
+
+

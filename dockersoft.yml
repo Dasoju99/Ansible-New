@@ -1,0 +1,12 @@
+
+- hosts: new
+  become: yes
+  tasks:
+  - name: Getting Code from get.docker.com 
+    shell: sudo curl -fsSL get.docker.com | /bin/bash	
+  - name: sudo apt update -y	
+    shell: sudo apt update -y	
+  - name: sudo apt install docker.io -y	
+    shell: sudo apt install docker.io 
+  - name: usermod to docker
+    shell: sudo usermod -aG docker ubuntu	

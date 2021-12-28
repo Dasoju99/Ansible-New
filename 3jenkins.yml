@@ -1,0 +1,78 @@
+- hosts: 172.31.38.7 
+  become: yes
+  vars:
+    prt: 8080 
+  tasks:
+  - name: install open JDK
+    tags:
+    - install
+    yum:
+      name: java-11-openjdk-devel
+      state: present
+  - name: Download Jenkins Repo
+    tags:
+    - install
+    get_url: 
+      url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+      dest: /etc/yum.repos.d/jenkins.repo
+  - name: import rpm key
+    tags:
+    - install
+    rpm_key:
+      key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+      state: present
+  - name: Install Epel release 
+    tags:
+    - install
+    yum:
+      name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm 
+      state: present
+      disable_gpg_check: yes
+  - name: install jenkins  
+    tags:
+    - install
+    yum:
+      name: jenkins
+      state: present
+  - name: change port of Jenkins from 8080 to {{prt}}
+    tags:
+    - install
+    replace:
+      regexp: JENKINS_PORT="8080"
+      replace: JENKINS_PORT="{{prt}}"
+      path: /etc/sysconfig/jenkins
+  - name: Start jenkins
+    tags:
+    - install
+    service:
+      name: jenkins
+      state: started
+  - name: enable jenkins on Boot Starp
+    tags:
+    - install
+    systemd:
+      name: jenkins
+      state: started
+  - name: Sleep for 30 Seconds or wait for port {{prt}} to be listening
+    tags:
+    - install
+    wait_for:
+      delay: 30
+      port: "{{prt}}"
+
+
+  - name: Get inint admin Password
+    tags:
+    - install
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+    register: jenkinspass
+  - name: Print jenkins password
+    tags:
+    - install
+    debug:
+      var: jenkinspass.stdout
+  - name: Restart the Jenkins service
+    tags:
+    - restart
+    shell: sudo systemctl restart jenkins
+

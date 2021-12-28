@@ -1,0 +1,13 @@
+- hosts: self
+  become: yes
+  tasks:
+  - name: Copy multiple files with multiple destinations and Permissions
+    copy:
+      src: "{{item.source}}"
+      dest: "{{item.dest}}"
+      mode: "{{item.mode}}"
+    with_items:
+    - {"source": "good.txt", "dest": "/opt/good.txt", "mode": "0007"}
+    - {"source": "best.txt", "dest": "/tmp/best.txt", "mode": "0707"}
+
+

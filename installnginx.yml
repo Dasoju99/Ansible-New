@@ -1,0 +1,26 @@
+
+- hosts: self
+  become: yes
+  vars:
+    package: nginx
+    location: Hyderabad
+    name: RajeshDasoju
+  tasks:
+  - name: Install Nginx
+    yum:
+      name: "{{package}}"
+      state: present
+  - name: Print Variables
+    debug:
+      msg: "Vaiable Name: {{name}} Location: {{location}}"
+  - name: copy Index.html
+    template:
+      src: index.html
+      dest: /usr/share/nginx/html/index.html
+    notify:
+    - Start Nginx service 
+  handlers:
+  - name: Start Nginx service
+    service:
+      name: nginx
+      state: started
